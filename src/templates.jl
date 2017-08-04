@@ -77,7 +77,7 @@ end
 
 function template(tuple::Expr, docstr::Union{Symbol, Expr})
     Meta.isexpr(tuple, :tuple) || error("invalid `@template` syntax on LHS.")
-    local curmod = current_module()
+    local curmod = @__MODULE__
     isdefined(curmod, TEMP_SYM) || eval(curmod, :(const $(TEMP_SYM) = $(Dict{Symbol, Vector}())))
     local block = Expr(:block)
     for category in tuple.args
@@ -93,7 +93,7 @@ template(sym::Symbol, docstr::Union{Symbol, Expr}) = template(Expr(:tuple, sym),
 
 
 function template_hook(docstr, expr::Expr)
-    local curmod = current_module()
+    local curmod = @__MODULE__
     local docex = interp_string(docstr)
     if isdefined(curmod, TEMP_SYM) && Meta.isexpr(docex, :string)
         local templates = getfield(curmod, TEMP_SYM)
